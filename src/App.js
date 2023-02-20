@@ -7,18 +7,32 @@ import "./App.css";
 import Entries from "./Entries";
 import AppBar from "./AppBar";
 import { generateUserInfo, generatePorjectsData } from "./utils";
-import { updateUserInfo, updateProjects, getProjects, projects as projectsDomain, user as userDomain, getUserInfo, getBalance, addEntry, getEntries} from './CQRS';
+import {
+  updateUserInfo,
+  updateProjects,
+  getProjects,
+  projects as projectsDomain,
+  user as userDomain,
+  getUserInfo,
+  getBalance,
+  addEntry,
+  getEntries,
+} from "./CQRS";
 import "./services";
-import rules from './Demo.json';
+import rules from "./Demo.json";
 
-import { initializeRulesEngine, startDevTools } from "@canaan_run/canaan";
+import {
+  initializeRulesEngine,
+  startDevTools,
+  store,
+} from "@canaan_run/canaan";
 
 function App() {
   const [selectedProject, setSelectedProject] = useState();
   const [user, setUser] = useState({});
-  const [projects, setProjects ] = useState([]); 
-  const [entries,setEntries] = useState([]);
-  const [balance, setBalance] = useState(0); 
+  const [projects, setProjects] = useState([]);
+  const [entries, setEntries] = useState([]);
+  const [balance, setBalance] = useState(0);
   const [data, setData] = useState({
     number: "",
     details: "",
@@ -33,10 +47,10 @@ function App() {
     projectsDomain.subscribe(getProjects, setProjects);
     userDomain.subscribe(getUserInfo, setUser);
     projectsDomain.subscribe(getBalance, setBalance);
-    projectsDomain.subscribe(getEntries,setEntries);
-    
+    projectsDomain.subscribe(getEntries, setEntries);
   }, []);
-  const {name, subscriptionType} = user; 
+  const { name, subscriptionType } = user;
+  console.log({ projects, user, store });
   return (
     <>
       <AppBar name={name} plan={subscriptionType} />
@@ -115,15 +129,14 @@ function App() {
                     onClick={() => {
                       addEntry({
                         label: selectedProject.label,
-                        number: data.number, 
+                        number: data.number,
                         details: data.details,
                         isVolunteering: selectedProject.isVolunteering,
                         type: selectedProject.calculationType,
                       });
-                      if(!data?.number)
-                      {
-                        alert("Please enter a number ")
-                        return; 
+                      if (!data?.number) {
+                        alert("Please enter a number ");
+                        return;
                       }
                     }}
                   >
@@ -139,7 +152,7 @@ function App() {
                 <Typography variant="h4">Work log</Typography>
               </Grid>
               <Grid item xs={6}>
-                  <Typography variant="h4">Balance: ${balance}</Typography>
+                <Typography variant="h4">Balance: ${balance || 0}</Typography>
               </Grid>
               <Grid item xs={12}>
                 <Entries entries={entries} />
